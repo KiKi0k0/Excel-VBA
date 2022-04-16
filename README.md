@@ -1,2 +1,2 @@
 # sample-repo
-Practice GitHub
+Practice GitHub 2
