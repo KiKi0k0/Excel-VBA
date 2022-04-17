@@ -1,5 +1,6 @@
 # sample-repo
-Git練習用
+
+Git practice
 
 Sub file_download(Driver As WebDriver, URL As String, KeyWord As String)
 
