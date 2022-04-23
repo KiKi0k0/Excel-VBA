@@ -1,114 +1,162 @@
-# sample-repo
+'***************************************************************************************************
+'参考文献:
+'***************************************************************************************************
+'https://itbyari.wordpress.com/2015/12/08/excel-vba-%E6%9A%97%E5%8F%B7%E5%8C%96%E3%81%A8%E5%BE%A9%E5%8F%B7%E5%8C%96%EF%BC%88tripledes%EF%BC%89/
 
-Git practice
 
-Sub file_download(Driver As WebDriver, URL As String, KeyWord As String)
 
-    'see https://www.browserstack.com/guide/download-file-using-selenium-python
-    Dim filepath As String
-    Dim caps As Capabilities
-    
-    Call WebDriverManager4TinySelenium.CreateFolderEx("D:\program\Download")
-    filepath = ".\Download" 'download to same directory as this excel file
-    
-    
-    Driver.StartEdge (".\Driver\msedgedriver.exe")
-    
-    Set caps = Driver.CreateCapabilities
 
-    caps.AddPref "download.default_directory", filepath
-    caps.AddPref "download.prompt_for_download", False
-    
-    'caps.SetDownloadPrefs filepath 'this does the above in one line
+Option Explicit
 
-    Driver.OpenBrowser caps
-    
-    Driver.NavigateTo URL
+'***************************************************************************************************
+'定数宣言
+'***************************************************************************************************
+'初期ベクトル
+Public Const INITIALIZATION_VECTOR = "78945612" '必ず8文字分
+'暗号用共通鍵
+Public Const TRIPLE_DES_KEY = "webcontrolver1.0" '必ず16文字分
 
-    Driver.Wait 500
-    
-    Driver.FindElement(by.XPath, KeyWord).Click
-    Driver.Wait 5000
-        
+'UserID 座標
+Const UserID_Column As Single = 1
+Const UserID_Row As Single = 2
 
+'UserPassword 座標
+Const UserPassword_Column As Single = 2
+Const UserPassword_Row As Single = 2
+
+'***************************************************************************************************
+'関数呼び出し
+'***************************************************************************************************
+Sub Encryption()
+    ThisWorkbook.ActiveSheet.Cells(UserID_Column, UserID_Row).Value = EncryptStringTripleDES(ThisWorkbook.ActiveSheet.Cells(UserID_Column, UserID_Row).Value)
+    ThisWorkbook.ActiveSheet.Cells(UserPassword_Column, UserPassword_Row).Value = EncryptStringTripleDES(ThisWorkbook.ActiveSheet.Cells(UserPassword_Column, UserPassword_Row).Value)
 End Sub
 
-Sub InstallDriver()
-
-    Call WebDriverManager4TinySelenium.InstallWebDriver(Edge, "D:\program\")
-    MsgBox ("Driverインストール完了")
-
+Sub Decode()
+    ThisWorkbook.ActiveSheet.Cells(UserID_Column, UserID_Row).Value = DecryptStringTripleDES(ThisWorkbook.ActiveSheet.Cells(UserID_Column, UserID_Row).Value)
+    ThisWorkbook.ActiveSheet.Cells(UserPassword_Column, UserPassword_Row).Value = DecryptStringTripleDES(ThisWorkbook.ActiveSheet.Cells(UserPassword_Column, UserPassword_Row).Value)
 End Sub
 
+'***************************************************************************************************
+'機　能：TripleDESによる暗号化（TripleDES暗号化⇒BASE64符号化）
+'引　数：暗号化対象平文
+'戻り値：暗号文（正常終了） or Null（異常終了)
+'備　考：
+'***************************************************************************************************
+Function EncryptStringTripleDES(plain_string As String) As Variant
+    'P0_変数
+    'P0-1_変数宣言
+    Dim encryption_object As Object
+    Dim plain_byte_data() As Byte
+    Dim encrypted_byte_data() As Byte
+    Dim encrypted_base64_string As String
+    
+    'P0-2_変数設定
+    
+    'P0-3_戻り値設定
+    EncryptStringTripleDES = Null
+    
+    'P1_事前処理
+    On Error GoTo FunctionError
+    
+    'P2_主処理
+    'P2-1_平文文字列⇒平文バイトデータ
+    plain_byte_data = CreateObject("System.Text.UTF8Encoding").GetBytes_4(plain_string)
+    
+    'P2-2_平文バイトデータ⇒暗号バイトデータ
+    Set encryption_object = CreateObject("System.Security.Cryptography.TripleDESCryptoServiceProvider")
+    encryption_object.key = CreateObject("System.Text.UTF8Encoding").GetBytes_4(TRIPLE_DES_KEY)
+    encryption_object.IV = CreateObject("System.Text.UTF8Encoding").GetBytes_4(INITIALIZATION_VECTOR)
+    encrypted_byte_data = _
+            encryption_object.CreateEncryptor().TransformFinalBlock(plain_byte_data, 0, UBound(plain_byte_data) + 1)
+    
+    'P2-3_暗号バイトデータ⇒BASE64符号文字列
+    encrypted_base64_string = BytesToBase64(encrypted_byte_data)
 
-'// zipから中身を取り出して指定の場所に実行ファイルを展開する
-'// chromedriver.exe(デフォルトの名前)があるところにchromedriver_94.exeとかで展開できるよう、
-'// 元の実行ファイルを上書きしないように一度tempフォルダを作ってから実行ファイルを目的のパスへ移す
-'// 普通zipを展開するときは展開先のフォルダを指定するが、
-'// この関数はWebDriverの実行ファイルのパスで指定するので注意！(展開するのもexeだけ)
-'// 使用例
-'//     Extract "C:\Users\yamato\Downloads\chromedriver_win32.zip", "C:\Users\yamato\Downloads\chromedriver_94.exe"
-Sub Extract(path_zip As String, path_save_to As String)
-    Debug.Print "zipを展開します"
+    'P3_事後処理
     
-    Dim file_Driver As String
-    Dim file_check As Boolean
+    'P4_結果表示 or 戻り値設定
+    EncryptStringTripleDES = encrypted_base64_string
     
-    If Right(path_save_to, 1) = "\" Then
-        file_Driver = path_save_to & "Driver"
-    Else
-        file_Driver = path_save_to & "\Driver"
-    End If
-    
-    
-    CreateFolderEx file_Driver
-        
-    'Dim folder_temp As String
-    'folder_temp = fso.BuildPath(fso.GetParentFolderName(path_save_to), fso.GetTempName)
-    'fso.CreateFolder folder_temp
-    'Debug.Print "    一時フォルダ : " & folder_temp
+    'P5_エラーハンドリング
+    Exit Function
+FunctionError:
+    MsgBox "TripleDESによる暗号化に失敗しました。"
+End Function
 
-    'PowerShellを使って展開するとマルウェア判定されたので，
-    'MS非推奨だがShell.Applicationを使ってzipを解凍する
-    'On Error GoTo Catch
-    Dim sh As Object
-    Set sh = CreateObject("Shell.Application")
-    'zipファイルに入っているファイルを指定したフォルダーにコピーする
-    '文字列を一度()で評価してからNamespaceに渡さないとエラーが出る
-    'sh.Namespace((folder_temp)).CopyHere sh.Namespace((path_zip)).Items
+'***************************************************************************************************
+'機　能：TripleDESによる復号化（BASE64復号化⇒DES復号化）
+'引　数：暗号文
+'戻り値：平文（正常終了） or Null（異常終了)
+'備　考：
+'***************************************************************************************************
+Function DecryptStringTripleDES(encrypted_string As String) As Variant
+    'P0_変数
+    'P0-1_変数宣言
+    Dim encryption_object As Object
+    Dim encrypted_byte_data() As Byte
+    Dim plain_byte_data() As Byte
+    Dim plain_string As String
+     
+    'P0-2_変数設定
     
+    'P0-3_戻り値設定
+    DecryptStringTripleDES = Null
+    
+    'P1_事前処理
+    On Error GoTo FunctionError
+    
+    'P2_主処理
+    'P2-1_BASE64符号文字列⇒DES暗号バイトデータ
+    encrypted_byte_data = Base64toBytes(encrypted_string)
+    
+    'P2-2_DES暗号バイトデータ⇒平文バイトデータ
+    Set encryption_object = CreateObject("System.Security.Cryptography.TripleDESCryptoServiceProvider")
+    encryption_object.key = CreateObject("System.Text.UTF8Encoding").GetBytes_4(TRIPLE_DES_KEY)
+    encryption_object.IV = CreateObject("System.Text.UTF8Encoding").GetBytes_4(INITIALIZATION_VECTOR)
+    plain_byte_data = encryption_object.CreateDecryptor().TransformFinalBlock(encrypted_byte_data, 0, UBound(encrypted_byte_data) + 1)
+            
+    'P2-3_平文バイトデータ⇒平文文字列化
+    plain_string = CreateObject("System.Text.UTF8Encoding").GetString(plain_byte_data)
+    
+    'P3_事後処理
+    
+    'P4_結果表示 or 戻り値設定
+    DecryptStringTripleDES = plain_string
+    
+    'P5_エラーハンドリング
+    Exit Function
+FunctionError:
+    MsgBox "TripleDESによる復号化に失敗しました。"
+End Function
 
-    file_check = fso.FileExists(file_Driver & "\msedgedriver.exe")
-    Debug.Print file_Driver
-    
-    If file_check = False Then
-        sh.Namespace((file_Driver)).CopyHere sh.Namespace((path_zip)).Items
-    Else
-        fso.DeleteFolder (file_Driver)
-        CreateFolderEx file_Driver
-        sh.Namespace((file_Driver)).CopyHere sh.Namespace((path_zip)).Items
-    End If
+'***************************************************************************************************
+'関数名：BytesToBase64
+'機　能：Byte配列→base64文字列への変換
+'引　数：Byte配列
+'戻り値：base64文字列
+'備　考：
+'***************************************************************************************************
+Function BytesToBase64(varBytes() As Byte) As String
+    With CreateObject("MSXML2.DomDocument").createElement("b64")
+        .DataType = "bin.base64"
+        .nodeTypedValue = varBytes
+        BytesToBase64 = Replace(.text, vbLf, "") '無意味に改行が含まれてしまうので除去
+    End With
+End Function
 
+'***************************************************************************************************
+'関数名：Base64toBytes
+'機　能：base64文字列→Byte配列への変換
+'引　数：base64文字列
+'戻り値：Byte配列
+'備　考：
+'***************************************************************************************************
+ Function Base64toBytes(varStr As String) As Byte()
+    With CreateObject("MSXML2.DOMDocument").createElement("b64")
+         .DataType = "bin.base64"
+         .text = varStr
+         Base64toBytes = .nodeTypedValue
+    End With
+ End Function
 
-
-    'Dim path_exe As String
-    'path_exe = fso.BuildPath(folder_temp, Dir(folder_temp & "\*.exe"))
-    
-    'If fso.FileExists(folder_temp) Then
-    '    fso.CopyFile folder_temp, path_save_to, True
-    'End If
-
-       
-    file_check = fso.FileExists(path_zip)
-    
-    If file_check = True Then fso.DeleteFile (path_zip)
-    
-    Debug.Print "    展開 : " & path_save_to
-    Debug.Print "WebDriverを配置しました"
-    Exit Sub
-    
-'Catch:
-    'fso.DeleteFolder folder_temp
-    'Err.raise 4002, , "Zipの展開に失敗しました。原因：" & Err.Description
-    'Exit Sub
-End Sub
