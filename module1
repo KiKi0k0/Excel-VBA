@@ -1,0 +1,68 @@
+Option Explicit
+
+Const ITEM_Row As Single = 1
+Const PN_Row As Single = 2
+Const ASSY_Row As Single = 3
+Const SCHEME_Row As Single = 4
+Const RSIK_Row As Single = 5
+Const TEHAI_Row As Single = 6
+
+Const Download_Path As String = "D:\program\Download\a.xlsx"
+
+Enum Number
+    ITEM_ = 1
+    PN_ = 2
+    ASSY_ = 3
+    SCHEME_ = 4
+    RSIK_ = 5
+    TEHAI_ = 6
+End Enum
+
+
+'Columnはfor文などでループさせる。Rowは表項目1～6で固定値。
+Private Function GetCellValue(Column As Single, Num_ As Number) As String
+
+    
+ Select Case (Num_)
+
+    Case 1
+        GetColumnRow = ThisWorkbook.ActiveSheet.Cells(Column, ITEM_Row).Value
+    Case 2
+        GetColumnRow = ThisWorkbook.ActiveSheet.Cells(Column, PN_Row).Value
+    Case 3
+        GetColumnRow = ThisWorkbook.ActiveSheet.Cells(Column, ASSY_Row).Value
+    Case 4
+        GetColumnRow = ThisWorkbook.ActiveSheet.Cells(Column, SCHEME_Row).Value
+    Case 5
+        GetColumnRow = ThisWorkbook.ActiveSheet.Cells(Column, RSIK_Row).Value
+    Case 6
+        GetColumnRow = ThisWorkbook.ActiveSheet.Cells(Column, TEHAI_Row).Value
+        
+ End Select
+
+End Function
+
+Private Function GetColumnCount(Num_ As Number)
+ Dim i As Single
+ i = 0
+ GetCoulmnCount = 0
+
+ Do While ThisWorkbook.ActiveSheet.Cells(Column + i, Num_).Value <> ""
+    i = i + 1
+    GetCoulmnCount = GetCoumnCount + 1
+ Loop
+End Function
+
+Public Sub OpenWorkbook()
+
+ Dim WB As Workbook
+ Dim ActWB As Workbook
+ 
+ Set ActWB = ActiveWorkbook
+ 
+ Workbooks.Open (Download_Path)
+ Set WB = Workbooks("a.xlsx")
+ 
+ Debug.Print WB.ActiveSheet.Cells(1, 1).Value
+
+End Sub
