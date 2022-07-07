@@ -1,0 +1,82 @@
+Option Explicit
+
+Const No_posX As Single = 1
+Const No_posY As Single = 1
+
+Const Command_posX As Single = 2
+Const Command_posY As Single = 1
+
+Const Value_posX As Single = 3
+Const Value_posY As Single = 1
+
+Enum SA_Function
+
+    
+
+End Enum
+
+Private Sub Measure()
+
+    Dim WBK As Workbook
+    Set WBK = ThisWorkbook
+    
+    
+    With WBK.ActiveSheet
+    
+        .Cells(Command_posY, Command_posX).Value = ""
+        .Cells(Value_posY, Value_posX).Value = ""
+        .Cells(Command_posY, Command_posX).Value = ""
+    
+    End With
+
+
+End Sub
+
+
+Function SA_Command(SA As Object, Command As String) As String
+
+    Select Case Command()
+    
+        Case FREQ
+            SA_Command = ""
+        
+        Case RES
+            SA_Command = ""
+        
+        Case BRW
+            SA_Command = ""
+        
+        Case START_FREQ
+            SA_Command = ""
+        
+        Case STOP_FREQ
+            SA_Command = ""
+        
+        Case CENTER_FREQ
+            SA_Command = ""
+        
+        Case PEAK_SEARCH
+            SA_Command = ""
+        
+        Case NEXT_PEAK
+            SA_Command = ""
+        
+        Case DELTA_MRK
+            SA_Command = ""
+            
+        Case AS_SINGLE
+            SA_Command = ""
+        
+        Case AS_CONST
+            SA_Command = ""
+        
+        Case CSV
+            SA_Command = ""
+        
+        Case Save
+            SA_Command = ""
+        
+    End Select
+
+
+End Function
