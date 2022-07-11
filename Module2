@@ -80,3 +80,43 @@ Function SA_Command(SA As Object, Command As String) As String
 
 
 End Function
+
+/////////////////////////////////////////////////
+
+Option Explicit
+
+Enum Command
+
+    FREQ_CENTER
+    FREQ_STOP
+    FREQ_START
+    
+End Enum
+
+Private Function Change_TextToCommand(text_command As String) As Command
+
+    Select Case (text_command)
+    
+    
+        Case "FREQ_CENTER"
+            Change_TextToCommand = FREQ_CENTER
+        
+        Case "FREQ_START"
+            Change_TextToCommand = FREQ_START
+        
+        Case "FREQ_STOP"
+            Change_TextToCommand = FREQ_STOP
+    
+    End Select
+
+End Function
+
+Sub test()
+
+    Dim Command_Num As Single
+
+    Command_Num = Change_TextToCommand("FREQ_START")
+
+    Debug.Print (Command_Num)
+
+End Sub
