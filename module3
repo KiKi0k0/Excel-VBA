@@ -1,0 +1,64 @@
+Option Explicit
+
+
+Const posY As Single = 1
+Const posX As Single = 1
+
+Const posY_change As Single = 2
+Const posX_change As Single = 1
+
+
+Const Focus_Offset_Row As Single = 10
+Const Focus_Offset_Column As Single = 10
+
+
+Sub test()
+
+
+
+    Dim Search_Word As String
+    Dim Search_Range As Range
+    
+    Dim Change_Word As String
+    Dim Message_Result As VbMsgBoxResult
+    
+    Dim memo As String
+    
+    Search_Word = ThisWorkbook.ActiveSheet.Cells(posY, posX).Value
+    Change_Word = ThisWorkbook.ActiveSheet.Cells(posY_change, posX_change).Value
+    
+    Set Search_Range = ThisWorkbook.ActiveSheet.Cells.Find(Search_Word)
+    
+    If Search_Range.Row = posY And Search_Range.Column = posX Then
+        MsgBox ("検索した文字列は存在しませんでした。")
+        Exit Sub
+    End If
+    
+    
+    Debug.Print Search_Range.Address & "には" & Search_Range.Value & "と入力されています。"
+        
+        
+    memo = ThisWorkbook.ActiveSheet.Cells(Search_Range.Row, Search_Range.Column).Value
+    Debug.Print memo
+    
+    
+    ThisWorkbook.ActiveSheet.Cells(Search_Range.Row, Search_Range.Column).Select
+    ActiveWindow.ScrollRow = Search_Range.Row - Focus_Offset_Row
+    ActiveWindow.ScrollColumn = Search_Range.Column - Focus_Offset_Column
+    
+    
+    Message_Result = MsgBox(Search_Word & "の文字列を" & Change_Word & "に変換します。" & vbLf & "問題がないことを確認してください。", vbYesNoCancel, "文字列置換え")
+    
+    If Message_Result = vbYes Then
+    
+        ThisWorkbook.ActiveSheet.Cells(Search_Range.Row, Search_Range.Column).Value = Change_Word
+    
+    Else
+        
+        MsgBox ("キャンセルしました。")
+        
+    End If
+
+
+
+End Sub
