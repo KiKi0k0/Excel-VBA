@@ -62,3 +62,37 @@ Sub test()
 
 
 End Sub
+
+Option Explicit
+
+Sub Sample1()
+    With Application.FileDialog(msoFileDialogFolderPicker)
+        If .Show = True Then
+            ThisWorkbook.ActiveSheet.Cells(1, 1).Value = .SelectedItems(1)
+        End If
+    End With
+End Sub
+
+Sub Test()
+
+    Dim FileName As Variant
+    
+    If ThisWorkbook.ActiveSheet.Cells(1, 1).Value = "" Then
+        'フォルダ位置移動
+        ChDir "D:\"
+    Else
+        '既に記載があれば、以前使用したエクセルが存在するフォルダの階層を抽出
+        Debug.Print Left(ThisWorkbook.ActiveSheet.Cells(1, 1).Value, InStrRev(ThisWorkbook.ActiveSheet.Cells(1, 1).Value, "\"))
+    End If
+
+    FileName = Application.GetOpenFilename(FileFilter:="Excelブック,*.xlsx,CSVファイル,*.csv")
+    
+    If FileName = False Then
+        Exit Sub
+    End If
+    
+    ThisWorkbook.ActiveSheet.Cells(1, 1).Value = FileName
+  
+End Sub
+
+
