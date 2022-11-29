@@ -63,7 +63,6 @@ Sub test()
 
 End Sub
 
-Option Explicit
 
 Sub Sample1()
     With Application.FileDialog(msoFileDialogFolderPicker)
@@ -72,6 +71,7 @@ Sub Sample1()
         End If
     End With
 End Sub
+
 
 Sub Test()
 
