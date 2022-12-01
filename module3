@@ -95,4 +95,24 @@ Sub Test()
   
 End Sub
 
+Public Sub AddExcel_Information()
+
+    Dim i As Single
+    Dim wbk As Workbook
+    Dim Workbook_Name As String
+
+    '既に記載があれば、以前使用したエクセルが存在するフォルダの階層を抽出
+    'Debug.Print Right(ThisWorkbook.ActiveSheet.Cells(posY, posX).Value, Len(ThisWorkbook.ActiveSheet.Cells(posY, posX).Value) - InStrRev(ThisWorkbook.ActiveSheet.Cells(posY, posX).Value, "\"))
+
+    Workbook_Name = Right(ThisWorkbook.ActiveSheet.Cells(posY, posX).Value, Len(ThisWorkbook.ActiveSheet.Cells(posY, posX).Value) - InStrRev(ThisWorkbook.ActiveSheet.Cells(posY, posX).Value, "\"))
+
+    Workbooks.Open ThisWorkbook.ActiveSheet.Cells(posY, posX).Value
+    Set wbk = Workbooks(Workbook_Name)
+    
+    For i = 1 To wbk.Worksheets.Count
+        MainMenu.Exchange_Sheet_Select.AddItem wbk.Worksheets(i).Name
+        MainMenu.Search_Sheet_Select.AddItem wbk.Worksheets(i).Name
+    Next
+
+End Sub
 
