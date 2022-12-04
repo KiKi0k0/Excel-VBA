@@ -144,6 +144,10 @@ Public Function SearchWords(UserExcelName As String, UserSheetName As String, Ke
     Dim MessageResult As VbMsgBoxResult
     Dim temp As String
     
+    
+    '検索位置固定のため初期値設定
+    Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(1, 1).Select
+    
     Set SearchRange = Workbooks(UserExcelName).Worksheets(UserSheetName).Cells.Find(What:=SearchWord, Lookat:=xlWhole, MatchCase:=True, MatchByte:=True)
     
     If SearchRange Is Nothing Then
