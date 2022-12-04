@@ -121,14 +121,17 @@ End Sub
 
 
 '------------------------------------------------------------------------
+
+
 Private Sub test()
 
  Dim a As String
+ 
  a = SearchWords("a.xlsx", "Sheet2", "S/N", "apple")
+
  Debug.Print a
 
 End Sub
-
 
 Public Function SearchWords(UserExcelName As String, UserSheetName As String, KeyWord As String, SearchWord As String) As String
 
@@ -141,14 +144,17 @@ Public Function SearchWords(UserExcelName As String, UserSheetName As String, Ke
     Dim MessageResult As VbMsgBoxResult
     Dim temp As String
     
-    Set SearchRange = Workbooks(UserExcelName).Worksheets(UserSheetName).Cells.Find(SearchWord)
+    Set SearchRange = Workbooks(UserExcelName).Worksheets(UserSheetName).Cells.Find(What:=SearchWord, Lookat:=xlWhole, MatchCase:=True, MatchByte:=True)
     
-    If SearchRange.Row = posY And SearchRange.Column = posX Then
+    If SearchRange Is Nothing Then
         MsgBox ("検索した文字列は存在しませんでした。")
         Exit Function
     End If
     
+    
     Debug.Print SearchRange.Address & "には" & SearchRange.Value & "と入力されています。"
+        
+        
     temp = Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(SearchRange.Row, SearchRange.Column).Value
     Debug.Print temp
     
