@@ -116,3 +116,58 @@ Public Sub AddExcel_Information()
 
 End Sub
 
+
+
+
+
+'------------------------------------------------------------------------
+Private Sub test()
+
+ Dim a As String
+ a = SearchWords("a.xlsx", "Sheet2", "S/N", "apple")
+ Debug.Print a
+
+End Sub
+
+
+Public Function SearchWords(UserExcelName As String, UserSheetName As String, KeyWord As String, SearchWord As String) As String
+
+    Const Offset_SN As Single = -3
+    Const Offset_Adress As Single = 3
+    Const Focus_Offset_Column As Single = 10
+    Const Focus_Offset_Row As Single = 10
+
+    Dim SearchRange As Range
+    Dim MessageResult As VbMsgBoxResult
+    Dim temp As String
+    
+    Set SearchRange = Workbooks(UserExcelName).Worksheets(UserSheetName).Cells.Find(SearchWord)
+    
+    If SearchRange.Row = posY And SearchRange.Column = posX Then
+        MsgBox ("検索した文字列は存在しませんでした。")
+        Exit Function
+    End If
+    
+    Debug.Print SearchRange.Address & "には" & SearchRange.Value & "と入力されています。"
+    temp = Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(SearchRange.Row, SearchRange.Column).Value
+    Debug.Print temp
+    
+    
+    Application.Goto Reference:=Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(SearchRange.Row - 2, SearchRange.Column - 2), Scroll:=True
+    Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(SearchRange.Row, SearchRange.Column).Select
+
+    
+    Select Case (KeyWord)
+    
+        Case "S/N":
+            SearchWords = Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(SearchRange.Row, SearchRange.Column - Offset_SN).Value
+        
+        Case "アドレス":
+            SearchWords = Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(SearchRange.Row, SearchRange.Column - Offset_SN).Value
+    
+        Case Else:
+            SearchWords = "No Matches"
+    
+    End Select
+
+End Function
