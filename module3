@@ -181,3 +181,74 @@ Public Function SearchWords(UserExcelName As String, UserSheetName As String, Ke
     End Select
 
 End Function
+
+
+
+'------------------------------------------------------------------------------------------------
+
+
+Private Sub test_1()
+
+ Call ExchangeWords("a.xlsx", "Sheet2", "S/N", "apple", "orange")
+
+End Sub
+
+
+Sub ExchangeWords(UserExcelName As String, UserSheetName As String, KeyWord As String, SearchWord As String, ChangeWord As String)
+
+    Const Offset_SN As Single = -3
+    Const Offset_Adress As Single = 3
+
+    Dim Search_Range As Range
+    Dim Message_Result As VbMsgBoxResult
+    Dim memo As String
+
+    
+    '検索位置固定のため初期値設定
+    Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(1, 1).Select
+    
+    Set Search_Range = Workbooks(UserExcelName).Worksheets(UserSheetName).Cells.Find(SearchWord)
+    
+    If Search_Range Is Nothing Then
+        MsgBox ("検索した文字列は存在しませんでした。")
+        Exit Sub
+    End If
+    
+    
+    Debug.Print Search_Range.Address & "には" & Search_Range.Value & "と入力されています。"
+        
+        
+    memo = Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(Search_Range.Row, Search_Range.Column).Value
+    Debug.Print memo
+    
+    
+    Application.Goto Reference:=Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(Search_Range.Row - 2, Search_Range.Column - 2), Scroll:=True
+    Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(Search_Range.Row, Search_Range.Column).Select
+    
+    Message_Result = MsgBox(SearchWord & "の文字列を" & ChangeWord & "に変換します。" & vbLf & "問題がないことを確認してください。", vbYesNoCancel, "文字列置換え")
+    
+    
+    If Message_Result = vbYes Then
+    
+    Else
+        MsgBox ("キャンセルしました。")
+        Exit Sub
+        
+    End If
+    
+    
+    Select Case (KeyWord)
+    
+        Case "S/N":
+            Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(Search_Range.Row, Search_Range.Column - Offset_SN).Value = ChangeWord
+        
+        Case "アドレス":
+            Workbooks(UserExcelName).Worksheets(UserSheetName).Cells(Search_Range.Row, Search_Range.Column - Offset_Adress).Value = ChangeWord
+    
+        Case Else:
+
+    End Select
+
+
+
+End Sub
