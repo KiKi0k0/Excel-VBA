@@ -252,3 +252,35 @@ Sub ExchangeWords(UserExcelName As String, UserSheetName As String, KeyWord As S
 
 
 End Sub
+
+
+
+
+
+'-----------------------------------------
+
+
+
+
+Sub testaa()
+
+    Call color("a.xlsx", "Sheet2")
+
+End Sub
+
+Private Sub color(UserExcelName As String, UserSheetName As String)
+    
+    Dim color As Variant
+    
+    
+    Workbooks(UserExcelName).Worksheets(UserSheetName).Select
+    Cells.Select
+    Selection.Copy
+    
+    Workbooks("b.xlsm").Worksheets("temp").Select
+    Cells.Select
+    
+    Selection.PasteSpecial Paste:=xlPasteFormats, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+
+
+End Sub
